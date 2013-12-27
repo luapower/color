@@ -7,7 +7,7 @@ v1.0 | Lua 5.1, Lua 5.2, LuaJIT 2
 
 ## `local color = require'color'`
 
-Color computation in HSL space. Shamelessly ripped off and modified from [Sputnik's colors lib][color], by Yuri Takhteyev.
+Color computation in HSL space. Shamelessly ripped off and modified from [Sputnik's colors lib][colors lib], by Yuri Takhteyev.
 
   * `r, g, b, s, L` are in 0..1 range.
   * `h` is in 0..360 range.
@@ -51,4 +51,4 @@ Color computation in HSL space. Shamelessly ripped off and modified from [Sputni
 ---------------------------------------------------- ------------------------------------------------
 
 
-[color]: http://sputnik.freewisdom.org/lib/colors/
+[colors lib]:    http://sputnik.freewisdom.org/lib/colors/

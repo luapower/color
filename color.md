@@ -1,6 +1,7 @@
 ---
-project: color
-tagline: color computation in HSL space
+project:     color
+tagline:     color computation in HSL space
+category:    2D Graphics
 ---
 
 v1.0 | Lua 5.1, Lua 5.2, LuaJIT 2

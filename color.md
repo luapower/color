@@ -4,8 +4,6 @@ tagline:     color computation in HSL space
 category:    2D Graphics
 ---
 
-v1.0 | Lua 5.1, Lua 5.2, LuaJIT 2
-
 ## `local color = require'color'`
 
 Color computation in HSL space. Shamelessly ripped off and modified from [Sputnik's colors lib][colors lib], by Yuri Takhteyev.

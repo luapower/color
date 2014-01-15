@@ -1,7 +1,6 @@
 ---
 project:     color
 tagline:     color computation in HSL space
-category:    2D Graphics
 ---
 
 ## `local color = require'color'`

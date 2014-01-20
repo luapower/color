@@ -1,6 +1,6 @@
 ---
-project:     color
-tagline:     color computation in HSL space
+project: color
+tagline: color computation
 ---
 
 ## `local color = require'color'`

@@ -27,6 +27,4 @@ function player:on_render(cr)
 	self:dot(0, 100, 40, {c1c:rgba()})
 end
 
-player:play()
-
-
+return player:play(...)

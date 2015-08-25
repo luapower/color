@@ -1,5 +1,4 @@
 ---
-project: color
 tagline: color computation
 ---
 

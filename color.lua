@@ -23,7 +23,7 @@ local function round(x)
 	return math.floor(x + 0.5)
 end
 
---HSL <-> RGB
+--HSL <-> RGB conversion
 
 local function h2rgb(m1, m2, h)
 	if h<0 then h = h+1 end
@@ -81,12 +81,12 @@ local function rgb_to_hsl(r, g, b)
 	return h * 360, s, l
 end
 
---RGB(A) <-> string
+--string parsing
 
 local rgb = '^rgb%s*%(([^,]+),([^,]+),([^,]+)%)$'
 local rgba = '^rgba%s*%(([^,]+),([^,]+),([^,]+),([^,]+)%)$'
 
-local function string_to_rgba(s)
+local function rgb_string_to_rgba(s)
 	local r, g, b, a
 	if s:sub(1,1) == '#' then
 		if #s == 4 or #s == 5 then -- '#rgb' or '#rgba'
@@ -130,14 +130,61 @@ local function string_to_rgba(s)
 	return r / 255, g / 255, b / 255, a / 255
 end
 
-local function string_to_rgb(s)
-	local r, g, b = string_to_rgba(s)
+local hsl = '^hsl%s*%(([^,]+),([^,]+),([^,]+)%)$'
+local hsla = '^hsla%s*%(([^,]+),([^,]+),([^,]+),([^,]+)%)$'
+
+local function np(s)
+	local p = s and tonumber((s:match'^([^%%]+)%%%s*$'))
+	return p and p * .01 or tonumber(s)
+end
+
+local function hsl_string_to_hsla(str)
+	local h, s, l, a = str:match(hsla)
+	if not h then
+		h, s, l = str:match(hsl)
+		a = 1
+	end
+	h = tonumber(h)
+	s = np(s)
+	l = np(l)
+	a = tonumber(a)
+	if not (h and s and l and a) then return nil end
+	return h, s, l, a
+end
+
+local function string_to_rgba(str)
+	local r, g, b, a = rgb_string_to_rgba(str)
+	if r then return r, g, b, a end
+	local h, s, l, a = hsl_string_to_hsla(str)
+	if not h then return nil end
+	local r, g, b = hsl_to_rgb(h, s, l)
+	return r, g, b, a
+end
+
+local function string_to_hsla(str)
+	local h, s, l, a = hsl_string_to_hsla(str)
+	if h then return h, s, l, a end
+	local r, g, b, a = rgb_string_to_rgba(str)
+	if not r then return nil end
+	local h, s, l = rgb_to_hsl(r, g, b)
+	return h, s, l, a
+end
+
+local function string_to_hsl(str)
+	local h, s, l = string_to_hsla(str)
+	if not h then return nil end
+	return h, s, l
+end
+
+local function string_to_rgb(str)
+	local r, g, b = string_to_rgba(str)
 	if not r then return nil end
 	return r, g, b
 end
 
-local function rgba_to_string(r, g, b, a, fmt)
-	local fmt = fmt or 'hexa'
+--string formatting
+
+local function rgba_to_rgb_string(r, g, b, a, fmt)
 	if fmt == 'hexa' or fmt == 'hex' then
 		return string.format(
 			fmt == 'hexa' and '#%02x%02x%02x%02x' or '#%02x%02x%02x',
@@ -164,42 +211,7 @@ local function rgba_to_string(r, g, b, a, fmt)
 	end
 end
 
-local function rgb_to_string(r, g, b, fmt)
-	return rgba_to_string(r, g, b, 1, fmt)
-end
-
---HSL(A) <-> string
-
-local hsl = '^hsl%s*%(([^,]+),([^,]+),([^,]+)%)$'
-local hsla = '^hsla%s*%(([^,]+),([^,]+),([^,]+),([^,]+)%)$'
-
-local function np(s)
-	local p = s and tonumber((s:match'^([^%%]+)%%%s*$'))
-	return p and p * .01 or tonumber(s)
-end
-
-local function string_to_hsla(str)
-	local h, s, l, a = str:match(hsla)
-	if not h then
-		h, s, l = str:match(hsl)
-		a = 1
-	end
-	h = tonumber(h)
-	s = np(s)
-	l = np(l)
-	a = tonumber(a)
-	if not (h and s and l and a) then return nil end
-	return h, s, l, a
-end
-
-local function string_to_hsl(s)
-	local h, s, l = string_to_hsla(s)
-	if not h then return nil end
-	return h, s, l
-end
-
-local function hsla_to_string(h, s, l, a, fmt)
-	local fmt = fmt or 'hsla%'
+local function hsla_to_hsl_string(h, s, l, a, fmt)
 	if fmt == 'hsla%' or fmt == 'hsl%' then
 		return string.format(
 			fmt == 'hsla%' and 'hsla(%d,%d%%,%d%%,%.2g)' or 'hsl(%d,%d%%,%d%%)',
@@ -216,10 +228,35 @@ local function hsla_to_string(h, s, l, a, fmt)
 	end
 end
 
+local hsl_fmt = {hsla=1, hsl=1, ['hsla%']=1, ['hsl%']=1}
+
+local function rgba_to_string(r, g, b, a, fmt)
+	fmt = fmt or 'hexa'
+	if hsl_fmt[fmt] then
+		local h, s, l = rgb_to_hsl(r, g, b)
+		return hsla_to_hsl_string(h, s, l, a, fmt)
+	else
+		return rgba_to_rgb_string(r, g, b, a, fmt)
+	end
+end
+
+local function hsla_to_string(h, s, l, a, fmt)
+	fmt = fmt or 'hsla%'
+	if not hsl_fmt[fmt] then
+		local r, g, b = hsl_to_rgb(h, s, l)
+		return rgba_to_rgb_string(r, g, b, a, fmt)
+	else
+		return hsla_to_hsl_string(h, s, l, a, fmt)
+	end
+end
+
+local function rgb_to_string(r, g, b, fmt)
+	return rgba_to_string(r, g, b, 1, fmt)
+end
+
 local function hsl_to_string(h, s, l, fmt)
 	return hsla_to_string(h, s, l, 1, fmt)
 end
-
 
 --color class
 
@@ -366,6 +403,8 @@ if not ... then
 	print(hsla_to_string(360, .5, .5, .5))
 	print(hsla_to_string(360, .5, .5, .5, 'hsla'))
 	print(hsl_to_string (360, .5, .5))
+	print(string_to_rgba'hsla(180, 1, .5, .5)')
+	print(string_to_hsla'rgba(128, 128, 128, .5)')
 end
 
 return color_module

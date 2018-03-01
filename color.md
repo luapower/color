@@ -18,15 +18,18 @@ Original code from Sputnik's [colors lib], by Yuri Takhteyev.
 ---------------------------------------------------- ------------------------------------------------
 `color.hsl_to_rgb(h, s, L) -> r, g, b`               HSL -> RGB; h is modulo 360; s, L are clamped to range
 `color.rgb_to_hsl(r, g, b) -> h, s, L`               RGB -> HSL; r, g, b are clamped to range
-`color.rgb_to_string(r, g, b[, fmt]) -> s`           generate `'#rrggbb'`, `#rgb` or `rgb(r, g, b)`
-`color.rgba_to_string(r, g, b, a[, fmt]) -> s`       generate `'#rrggbbaa'`, `#rgba` or `rgba(r, g, b, a)`
-`color.string_to_rgba(s) -> r, g, b, a | nil`        parse a rgb(a) color
-`color.string_to_rgb(s) -> r, g, b | nil`            parse a rgb(a) color and return only the r, g, b values
-`color.string_to_hsla(s) -> h, s, l, a | nil`        parse a `'hsl(h, s%, l%, a)'` color
+`color.rgba_to_string(r, g, b, a[, fmt]) -> s`       format a color from RGBA
+`color.rgb_to_string (r, g, b   [, fmt]) -> s`       format a color from RGB
+`color.hsla_to_string(h, s, L, a[, fmt]) -> s`       format a color from HSLA
+`color.hsl_to_string (h, s, L   [, fmt]) -> s`       format a color from HSL
+`color.string_to_rgba(s) -> r, g, b, a | nil`        parse a color as RGBA
+`color.string_to_rgb (s) -> r, g, b    | nil`        parse a color as RGB
+`color.string_to_hsla(s) -> h, s, L, a | nil`        parse a color as HSLA
+`color.string_to_hsl (s) -> h, s, L    | nil`        parse a color as HSL
 ---------------------------------------------------- ------------------------------------------------
 
-For rgb(a), `fmt` can be `hexa` (default), `hexa1`, `hex`, `hex1`, `rgba`, `rgb`.
-For hsl(a), `fmt` can be `hsla%` (default), `hsl%`, `hsla`, `hsl`.
+`fmt` can be `hexa` (default for `rgba_to_string`), `hexa1`, `hex`, `hex1`,
+`rgba`, `rgb`, `hsla%` (default for `hsla_to_string`), `hsl%`, `hsla`, `hsl`.
 
 ## Color objects
 
